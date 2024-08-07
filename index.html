@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #f5f5f5;
+        }
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .product-form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        .product-form input, .product-form button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .product-form button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .product-form button:hover {
+            background-color: #218838;
+        }
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .product-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            width: calc(33.333% - 20px);
+            box-sizing: border-box;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .product-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        @media (max-width: 768px) {
+            .product-item {
+                width: calc(50% - 20px);
+            }
+        }
+        @media (max-width: 480px) {
+            .product-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add a Product</h1>
+        <div class="product-form">
+            <input type="text" id="product-name" placeholder="Product Name">
+            <input type="number" id="product-price" placeholder="Product Price">
+            <input type="file" id="product-image" accept="image/*">
+            <button onclick="addProduct()">Add Product</button>
+        </div>
+        <div class="product-list" id="product-list">
+            <h2>Product List</h2>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', loadProducts);
+
+        function addProduct() {
+            var productName = document.getElementById('product-name').value;
+            var productPrice = document.getElementById('product-price').value;
+            var productImage = document.getElementById('product-image').files[0];
+
+            if (productName && productPrice && productImage) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var productList = getProducts();
+                    var product = {
+                        name: productName,
+                        price: productPrice,
+                        image: e.target.result
+                    };
+                    productList.push(product);
+                    localStorage.setItem('products', JSON.stringify(productList));
+                    displayProduct(product);
+                }
+                reader.readAsDataURL(productImage);
+
+                document.getElementById('product-name').value = '';
+                document.getElementById('product-price').value = '';
+                document.getElementById('product-image').value = '';
+            } else {
+                alert('Please enter product name, price, and select an image.');
+            }
+        }
+
+        function loadProducts() {
+            var productList = getProducts();
+            productList.forEach(displayProduct);
+        }
+
+        function getProducts() {
+            var products = localStorage.getItem('products');
+            return products ? JSON.parse(products) : [];
+        }
+
+        function displayProduct(product) {
+            var productList = document.getElementById('product-list');
+
+            var productItem = document.createElement('div');
+            productItem.classList.add('product-item');
+
+            var productNameElement = document.createElement('h3');
+            productNameElement.innerText = product.name;
+
+            var productPriceElement = document.createElement('p');
+            productPriceElement.innerText = 'Price: $' + product.price;
+
+            var productImageElement = document.createElement('img');
+            productImageElement.src = product.image;
+
+            productItem.appendChild(productImageElement);
+            productItem.appendChild(productNameElement);
+            productItem.appendChild(productPriceElement);
+
+            productList.appendChild(productItem);
+        }
+    </script>
+</body>
+</html>
